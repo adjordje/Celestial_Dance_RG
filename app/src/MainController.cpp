@@ -5,7 +5,21 @@
 #include "engine/graphics/GraphicsController.hpp"
 #include "engine/graphics/OpenGL.hpp"
 
+class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
+public:
+    void on_mouse_move(engine::platform::MousePosition position) override;
+};
+
+void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition position) {
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto camera = graphics->camera();
+    camera->rotate_camera(position.dx, position.dy);
+}
+
 void MainController::initialize() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
+
     engine::graphics::OpenGL::enable_depth_testing();
 }
 
@@ -15,6 +29,29 @@ bool MainController::loop() {
         return false;
     }
     return true;
+}
+
+void MainController::update_camera() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto camera = graphics->camera();
+    float dt = platform->dt();
+    if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {
+        camera->move_camera(engine::graphics::Camera::Movement::FORWARD, 4 * dt);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_S).is_down()) {
+        camera->move_camera(engine::graphics::Camera::Movement::BACKWARD, 4 * dt);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_A).is_down()) {
+        camera->move_camera(engine::graphics::Camera::Movement::LEFT, 4 * dt);
+    }
+    if (platform->key(engine::platform::KeyId::KEY_D).is_down()) {
+        camera->move_camera(engine::graphics::Camera::Movement::RIGHT, 4 * dt);
+    }
+}
+
+void MainController::update() {
+    update_camera();
 }
 
 void MainController::draw_earth() {

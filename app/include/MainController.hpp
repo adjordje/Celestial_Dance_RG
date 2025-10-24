@@ -17,6 +17,10 @@ private:
     void end_draw() override;
     void draw_earth();
 
+    void update_camera();
+
+    void update() override;
+
 };
 
 
