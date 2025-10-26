@@ -24,6 +24,9 @@ void MainController::initialize() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
 
+    m_sunPosition = glm::vec3(0.0f, -5.0f, -25.0f);
+    m_earthPosition = glm::vec3(0.0f, -5.0f, -5.0f);
+
     engine::graphics::OpenGL::enable_depth_testing();
 }
 
