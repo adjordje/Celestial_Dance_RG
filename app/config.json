@@ -3,6 +3,9 @@
     "models": {
       "earth" : {
         "path" : "earth/earth.obj"
+      },
+      "sun" : {
+        "path" : "sun/13913_Sun_v2_l3.obj"
       }
     }
   },
