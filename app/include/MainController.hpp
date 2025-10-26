@@ -29,7 +29,7 @@ private:
     glm::vec3 m_earthPosition;
 
     float m_earthRotationAngle;
-
+    float m_sunRotationAngle;
 
 };
 
