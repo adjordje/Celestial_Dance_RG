@@ -40,6 +40,8 @@ private:
     float m_moonOrbitAngle;
     float m_moonOrbitRadius;
 
+    bool m_earthRotationEnabled; // Zemlja rotira oko svoje ose
+
 };
 
 

@@ -79,10 +79,17 @@ void MainController::update() {
     auto camera = graphics->camera();
     float dt = platform->dt();
 
+    // Zemlja rotacija
+    if (platform->key(engine::platform::KeyId::KEY_1).state() == engine::platform::Key::State::JustPressed) {
+        m_earthRotationEnabled = !m_earthRotationEnabled;
+    }
+
     // Rotacija Zemlje oko svoje ose
-    m_earthRotationAngle += dt * glm::radians(15.0f);
-    if (m_earthRotationAngle > glm::two_pi<float>())
-        m_earthRotationAngle -= glm::two_pi<float>();
+    if (m_earthRotationEnabled) {
+        m_earthRotationAngle += dt * glm::radians(15.0f);
+        if (m_earthRotationAngle > glm::two_pi<float>())
+            m_earthRotationAngle -= glm::two_pi<float>();
+    }
 
     // Rotacija Zemlje oko Sunca
     m_earthOrbitAngle += dt * glm::radians(5.0f);
