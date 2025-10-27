@@ -26,13 +26,21 @@ void MainController::initialize() {
 
     m_sunPosition = glm::vec3(0.0f, -5.0f, -25.0f);
     m_earthStartPosition = glm::vec3(0.0f, -5.0f, -5.0f);
+    m_moonStartPosition = glm::vec3(0.0f, -5.0f, -7.5f);
+
+    m_earthRotationAngle = 0.0f;
+    m_sunRotationAngle = 0.0f;
+    m_moonRotationAngle = 0.0f;
 
     glm::vec3 dirES = m_earthStartPosition - m_sunPosition;
     m_earthOrbitRadius = glm::length(dirES);
 
-    m_earthRotationAngle = 0.0f;
-    m_sunRotationAngle = 0.0f;
     m_earthOrbitAngle = atan2(dirES.z, dirES.x); //daje ugao u xy-ravni
+
+    glm::vec3 dirME = m_moonStartPosition - m_earthStartPosition;
+    m_moonOrbitRadius = glm::length(dirME);
+
+    m_moonOrbitAngle = atan2(dirME.z, dirME.x);
 
     engine::graphics::OpenGL::enable_depth_testing();
 }
@@ -89,6 +97,20 @@ void MainController::update() {
     m_sunRotationAngle += dt * glm::radians(0.5f);
     if (m_sunRotationAngle > glm::two_pi<float>())
         m_sunRotationAngle -= glm::two_pi<float>();
+
+    // Rotacija Meseca oko svoje ose
+    m_moonRotationAngle += dt * glm::radians(80.0f);
+    if (m_moonRotationAngle > glm::two_pi<float>())
+        m_moonRotationAngle -= glm::two_pi<float>();
+
+    // Rotacija Meseca oko Zemlje
+    m_moonOrbitAngle += dt * glm::radians(50.0f);
+    if (m_moonOrbitAngle > glm::two_pi<float>())
+        m_moonOrbitAngle -= glm::two_pi<float>();
+
+    m_moonPosition.x = m_earthPosition.x + m_moonOrbitRadius * cos(m_moonOrbitAngle);
+    m_moonPosition.y = m_earthPosition.y;
+    m_moonPosition.z = m_earthPosition.z + m_moonOrbitRadius * sin(m_moonOrbitAngle);
 }
 
 void MainController::draw_earth() {
@@ -145,7 +167,8 @@ void MainController::draw_moon() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model = glm::mat4(1.0f);
 
-    model = glm::translate(model, glm::vec3(0.0f, -5.0f, -7.5f));
+    model = glm::translate(model, m_moonPosition);
+    model = glm::rotate(model, m_moonRotationAngle, glm::vec3(0.0f, 0.93f, 0.07f));
     model = glm::scale(model, glm::vec3(0.15f));
 
     shader->set_mat4("model", model);

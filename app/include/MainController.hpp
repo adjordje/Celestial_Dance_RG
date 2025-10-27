@@ -29,11 +29,16 @@ private:
     glm::vec3 m_sunPosition;
     glm::vec3 m_earthStartPosition;
     glm::vec3 m_earthPosition;
+    glm::vec3 m_moonStartPosition;
+    glm::vec3 m_moonPosition;
 
     float m_earthRotationAngle;
     float m_sunRotationAngle;
     float m_earthOrbitRadius;
     float m_earthOrbitAngle;
+    float m_moonRotationAngle;
+    float m_moonOrbitAngle;
+    float m_moonOrbitRadius;
 
 };
 
