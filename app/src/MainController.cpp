@@ -25,10 +25,14 @@ void MainController::initialize() {
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
 
     m_sunPosition = glm::vec3(0.0f, -5.0f, -25.0f);
-    m_earthPosition = glm::vec3(0.0f, -5.0f, -5.0f);
+    m_earthStartPosition = glm::vec3(0.0f, -5.0f, -5.0f);
+
+    glm::vec3 dirES = m_earthStartPosition - m_sunPosition;
+    m_earthOrbitRadius = glm::length(dirES);
 
     m_earthRotationAngle = 0.0f;
     m_sunRotationAngle = 0.0f;
+    m_earthOrbitAngle = atan2(dirES.z, dirES.x); //daje ugao u xy-ravni
 
     engine::graphics::OpenGL::enable_depth_testing();
 }
@@ -72,6 +76,15 @@ void MainController::update() {
     if (m_earthRotationAngle > glm::two_pi<float>())
         m_earthRotationAngle -= glm::two_pi<float>();
 
+    // Rotacija Zemlje oko Sunca
+    m_earthOrbitAngle += dt * glm::radians(5.0f);
+    if (m_earthOrbitAngle > glm::two_pi<float>())
+        m_earthOrbitAngle -= glm::two_pi<float>();
+
+    m_earthPosition.x = m_sunPosition.x + m_earthOrbitRadius * cos(m_earthOrbitAngle);
+    m_earthPosition.y = m_sunPosition.y;
+    m_earthPosition.z = m_sunPosition.z + m_earthOrbitRadius * sin(m_earthOrbitAngle);
+
     // Rotacija Sunca oko svoje ose
     m_sunRotationAngle += dt * glm::radians(0.5f);
     if (m_sunRotationAngle > glm::two_pi<float>())
@@ -90,7 +103,7 @@ void MainController::draw_earth() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, -5.0f, -5.0f));
+    model = glm::translate(model, m_earthPosition);
     model = glm::rotate(model, 3.14f, glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::rotate(model, m_earthRotationAngle, glm::vec3(0.0f, 0.765f, 0.235f)); //rotacija oko svoje ose
 

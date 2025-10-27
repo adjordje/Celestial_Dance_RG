@@ -26,10 +26,13 @@ private:
     void update() override;
 
     glm::vec3 m_sunPosition;
+    glm::vec3 m_earthStartPosition;
     glm::vec3 m_earthPosition;
 
     float m_earthRotationAngle;
     float m_sunRotationAngle;
+    float m_earthOrbitRadius;
+    float m_earthOrbitAngle;
 
 };
 
