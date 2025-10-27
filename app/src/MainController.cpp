@@ -132,6 +132,27 @@ void MainController::draw_sun() {
     sun->draw(shader);
 }
 
+void MainController::draw_moon() {
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+
+    engine::resources::Model *moon = resources->model("moon");
+
+    engine::resources::Shader *shader = resources->shader("moon_shader");
+
+    shader->use();
+    shader->set_mat4("projection", graphics->projection_matrix());
+    shader->set_mat4("view", graphics->camera()->view_matrix());
+    glm::mat4 model = glm::mat4(1.0f);
+
+    model = glm::translate(model, glm::vec3(0.0f, -5.0f, -7.5f));
+    model = glm::scale(model, glm::vec3(0.15f));
+
+    shader->set_mat4("model", model);
+
+    moon->draw(shader);
+}
+
 void MainController::draw_skybox() {
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto skybox = resources->skybox("space_skybox");
@@ -147,6 +168,7 @@ void MainController::begin_draw() {
 void MainController::draw() {
     draw_sun();
     draw_earth();
+    draw_moon();
     draw_skybox();
 }
 

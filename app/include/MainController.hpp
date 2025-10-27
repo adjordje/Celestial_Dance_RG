@@ -19,6 +19,7 @@ private:
     void end_draw() override;
     void draw_earth();
     void draw_sun();
+    void draw_moon();
     void draw_skybox();
 
     void update_camera();
