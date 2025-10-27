@@ -44,6 +44,7 @@ void MainController::initialize() {
 
     m_earthOrbitEnabled = true;
     m_earthRotationEnabled = true;
+    m_sunRotationEnabled = true;
 
     engine::graphics::OpenGL::enable_depth_testing();
 }
@@ -90,6 +91,10 @@ void MainController::update() {
     if (platform->key(engine::platform::KeyId::KEY_2).state() == engine::platform::Key::State::JustPressed) {
         m_earthOrbitEnabled = !m_earthOrbitEnabled;
     }
+    // Sunce rotacija
+    if (platform->key(engine::platform::KeyId::KEY_3).state() == engine::platform::Key::State::JustPressed) {
+        m_sunRotationEnabled = !m_sunRotationEnabled;
+    }
 
     // Rotacija Zemlje oko svoje ose
     if (m_earthRotationEnabled) {
@@ -110,9 +115,11 @@ void MainController::update() {
     m_earthPosition.z = m_sunPosition.z + m_earthOrbitRadius * sin(m_earthOrbitAngle);
 
     // Rotacija Sunca oko svoje ose
-    m_sunRotationAngle += dt * glm::radians(0.5f);
-    if (m_sunRotationAngle > glm::two_pi<float>())
-        m_sunRotationAngle -= glm::two_pi<float>();
+    if (m_sunRotationEnabled) {
+        m_sunRotationAngle += dt * glm::radians(0.5f);
+        if (m_sunRotationAngle > glm::two_pi<float>())
+            m_sunRotationAngle -= glm::two_pi<float>();
+    }
 
     // Rotacija Meseca oko svoje ose
     m_moonRotationAngle += dt * glm::radians(80.0f);
