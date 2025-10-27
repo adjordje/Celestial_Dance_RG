@@ -45,6 +45,8 @@ void MainController::initialize() {
     m_earthOrbitEnabled = true;
     m_earthRotationEnabled = true;
     m_sunRotationEnabled = true;
+    m_moonRotationEnabled = true;
+    m_moonOrbitEnabled = true;
 
     engine::graphics::OpenGL::enable_depth_testing();
 }
@@ -95,6 +97,14 @@ void MainController::update() {
     if (platform->key(engine::platform::KeyId::KEY_3).state() == engine::platform::Key::State::JustPressed) {
         m_sunRotationEnabled = !m_sunRotationEnabled;
     }
+    // Mesec rotacija
+    if (platform->key(engine::platform::KeyId::KEY_4).state() == engine::platform::Key::State::JustPressed) {
+        m_moonRotationEnabled = !m_moonRotationEnabled;
+    }
+    // Mesec rotacija oko Zemlje
+    if (platform->key(engine::platform::KeyId::KEY_5).state() == engine::platform::Key::State::JustPressed) {
+        m_moonOrbitEnabled = !m_moonOrbitEnabled;
+    }
 
     // Rotacija Zemlje oko svoje ose
     if (m_earthRotationEnabled) {
@@ -122,14 +132,18 @@ void MainController::update() {
     }
 
     // Rotacija Meseca oko svoje ose
-    m_moonRotationAngle += dt * glm::radians(80.0f);
-    if (m_moonRotationAngle > glm::two_pi<float>())
-        m_moonRotationAngle -= glm::two_pi<float>();
+    if (m_moonRotationEnabled) {
+        m_moonRotationAngle += dt * glm::radians(80.0f);
+        if (m_moonRotationAngle > glm::two_pi<float>())
+            m_moonRotationAngle -= glm::two_pi<float>();
+    }
 
     // Rotacija Meseca oko Zemlje
-    m_moonOrbitAngle += dt * glm::radians(50.0f);
-    if (m_moonOrbitAngle > glm::two_pi<float>())
-        m_moonOrbitAngle -= glm::two_pi<float>();
+    if (m_moonOrbitEnabled) {
+        m_moonOrbitAngle += dt * glm::radians(50.0f);
+        if (m_moonOrbitAngle > glm::two_pi<float>())
+            m_moonOrbitAngle -= glm::two_pi<float>();
+    }
 
     m_moonPosition.x = m_earthPosition.x + m_moonOrbitRadius * cos(m_moonOrbitAngle);
     m_moonPosition.y = m_earthPosition.y;

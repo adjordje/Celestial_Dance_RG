@@ -43,6 +43,8 @@ private:
     bool m_earthRotationEnabled; // Zemlja rotira oko svoje ose
     bool m_earthOrbitEnabled; // Zemlja orbitira oko Sunca
     bool m_sunRotationEnabled; // Sunce rotira oko svoje ose
+    bool m_moonRotationEnabled; // Mesec rotira oko svoje ose
+    bool m_moonOrbitEnabled; // Mesec orbitira oko Zemlje
 
 };
 
