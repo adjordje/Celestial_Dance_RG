@@ -38,16 +38,19 @@ uniform sampler2D textureDiffuse;
 uniform vec3 lightDir;
 uniform vec3 viewPos;
 uniform bool blinn;
+// point light od Meseca
+uniform vec3 pointLightPos;
+uniform vec3 pointLightColor;
 
 void main() {
     vec3 baseColor = texture(textureDiffuse, fs_in.TexCoords).rgb;
 
+    // directional light
     // diffuse
     vec3 normal = normalize(fs_in.Normal);
     vec3 dirLight = normalize(-lightDir);
     float diff = max(dot(dirLight, normal), 0.0);
     vec3 diffuse = diff * baseColor;
-
     // specular
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
     float spec = 0.0;
@@ -58,13 +61,19 @@ void main() {
         vec3 reflectDir = reflect(-lightDir, normal);
         spec = pow(max(dot(viewDir, reflectDir), 0.0), 8.0);
     }
-
     vec3 specular = vec3(0.02) * spec;
-
     // ambient
     vec3 ambient = 0.2 * baseColor;
 
+    // point light
+    // diffuse
+    vec3 pointDir = normalize(pointLightPos - fs_in.FragPos);
+    float pointDiff = max(dot(normal, pointDir), 0.0);
+    float distance = length(pointLightPos - fs_in.FragPos);
+    float attenuation = 1.0 / (distance * distance);
+    vec3 pointDiffuse = pointDiff * pointLightColor * attenuation;
+
     vec3 dayColor = ambient + diffuse + specular;
 
-    FragColor = vec4(dayColor, 1.0);
+    FragColor = vec4(dayColor + pointDiffuse, 1.0);
 }

@@ -170,9 +170,14 @@ void MainController::draw_earth() {
 
     glm::vec3 lightDir = glm::normalize(m_earthPosition - m_sunPosition);
 
+    // za directional light
     shader->set_vec3("lightDir", lightDir);
     shader->set_vec3("viewPos", graphics->camera()->Position);
     shader->set_bool("blinn", true);
+
+    // za point light
+    shader->set_vec3("pointLightPos", m_moonPosition);
+    shader->set_vec3("pointLightColor", glm::vec3(0.1f));
 
     earth->draw(shader);
 }
