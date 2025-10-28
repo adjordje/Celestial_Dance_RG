@@ -236,3 +236,31 @@ void MainController::end_draw() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     platform->swap_buffers();
 }
+
+glm::vec3 MainController::get_earths_position() const {
+    return m_earthPosition;
+}
+
+glm::vec3 MainController::get_moons_position() const {
+    return m_moonPosition;
+}
+
+bool MainController::is_earth_rotation_enabled() const {
+    return m_earthRotationEnabled;
+}
+
+bool MainController::is_earth_orbit_enabled() const {
+    return m_earthOrbitEnabled;
+}
+
+bool MainController::is_sun_rotation_enabled() const {
+    return m_sunRotationEnabled;
+}
+
+bool MainController::is_moon_rotation_enabled() const {
+    return m_moonRotationEnabled;
+}
+
+bool MainController::is_moon_orbit_enabled() const {
+    return m_moonOrbitEnabled;
+}

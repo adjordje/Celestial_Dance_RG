@@ -10,6 +10,14 @@ public:
         return "MainController";
     }
 
+    glm::vec3 get_earths_position() const;
+    glm::vec3 get_moons_position() const;
+    bool is_earth_rotation_enabled() const;
+    bool is_earth_orbit_enabled() const;
+    bool is_sun_rotation_enabled() const;
+    bool is_moon_rotation_enabled() const;
+    bool is_moon_orbit_enabled() const;
+
 private:
     void initialize() override;
     bool loop() override;
