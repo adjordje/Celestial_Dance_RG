@@ -168,6 +168,12 @@ void MainController::draw_earth() {
 
     shader->set_mat4("model", model);
 
+    glm::vec3 lightDir = glm::normalize(m_earthPosition - m_sunPosition);
+
+    shader->set_vec3("lightDir", lightDir);
+    shader->set_vec3("viewPos", graphics->camera()->Position);
+    shader->set_bool("blinn", true);
+
     earth->draw(shader);
 }
 
