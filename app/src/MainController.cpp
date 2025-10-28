@@ -214,6 +214,12 @@ void MainController::draw_moon() {
     model = glm::rotate(model, m_moonRotationAngle, glm::vec3(0.0f, 0.93f, 0.07f));
     model = glm::scale(model, glm::vec3(0.15f));
 
+    glm::vec3 lightDir = glm::normalize(m_moonPosition - m_sunPosition);
+
+    shader->set_vec3("lightDir", lightDir);
+    shader->set_vec3("viewPos", graphics->camera()->Position);
+    shader->set_bool("blinn", true);
+
     shader->set_mat4("model", model);
 
     moon->draw(shader);
