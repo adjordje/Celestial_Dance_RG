@@ -40,6 +40,10 @@ void GUIController::draw() {
     ImGui::Text("Moon Rotation (around own axis) - {KEY4}: %s", mainController->is_moon_rotation_enabled() ? "ON" : "OFF");
     ImGui::Text("Moon Rotation (around Earth) - {KEY5}: %s", mainController->is_moon_orbit_enabled() ? "ON" : "OFF");
 
+    ImGui::Separator();
+
+    ImGui::SliderFloat("Moon light intensity", &mainController->m_moonLightIntensity, 0.0f, 3.0f);
+
     ImGui::End();
 
     graphics->end_gui();

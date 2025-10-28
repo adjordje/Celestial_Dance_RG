@@ -48,6 +48,8 @@ void MainController::initialize() {
     m_moonRotationEnabled = true;
     m_moonOrbitEnabled = true;
 
+    m_moonLightIntensity = 1.0f;
+
     engine::graphics::OpenGL::enable_depth_testing();
 }
 
@@ -177,7 +179,7 @@ void MainController::draw_earth() {
 
     // za point light
     shader->set_vec3("pointLightPos", m_moonPosition);
-    shader->set_vec3("pointLightColor", glm::vec3(0.1f));
+    shader->set_vec3("pointLightColor", glm::vec3(0.1f) * m_moonLightIntensity);
 
     earth->draw(shader);
 }

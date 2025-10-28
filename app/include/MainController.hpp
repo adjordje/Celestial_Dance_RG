@@ -10,6 +10,8 @@ public:
         return "MainController";
     }
 
+    float m_moonLightIntensity; // za gui
+
     glm::vec3 get_earths_position() const;
     glm::vec3 get_moons_position() const;
     bool is_earth_rotation_enabled() const;
