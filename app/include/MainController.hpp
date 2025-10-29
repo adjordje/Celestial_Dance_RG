@@ -4,6 +4,15 @@
 
 #include <glm/vec3.hpp>
 
+struct TimedEvent {
+    bool active = false;
+    double startTime = 0.0;
+    double delayA = 0.0;
+    double delayB = 0.0;
+    bool eventATriggered = false;
+    bool eventBTriggered = false;
+};
+
 class MainController : public engine::core::Controller {
 public:
     std::string_view name() const override {
@@ -19,6 +28,8 @@ public:
     bool is_sun_rotation_enabled() const;
     bool is_moon_rotation_enabled() const;
     bool is_moon_orbit_enabled() const;
+    bool is_moon_visible() const;
+    bool is_event_active() const;
 
 private:
     void initialize() override;
@@ -33,8 +44,10 @@ private:
     void draw_skybox();
 
     void update_camera();
-
     void update() override;
+
+    void startTimedEvent(double a, double b);
+    void resetTimedEvent();
 
     glm::vec3 m_sunPosition;
     glm::vec3 m_earthStartPosition;
@@ -55,6 +68,11 @@ private:
     bool m_sunRotationEnabled; // Sunce rotira oko svoje ose
     bool m_moonRotationEnabled; // Mesec rotira oko svoje ose
     bool m_moonOrbitEnabled; // Mesec orbitira oko Zemlje
+
+    // za event
+    bool m_drawMoon;
+    glm::vec3 m_lightColor;
+    TimedEvent m_timedEvent;
 
 };
 

@@ -34,23 +34,26 @@ in VS_OUT {
 } fs_in;
 
 uniform sampler2D textureDiffuse;
+uniform sampler2D nightLightsTex;
 // dirctional light
 uniform vec3 lightDir;
 uniform vec3 viewPos;
 uniform bool blinn;
+uniform vec3 lightColor;
 // point light od Meseca
 uniform vec3 pointLightPos;
 uniform vec3 pointLightColor;
 
 void main() {
     vec3 baseColor = texture(textureDiffuse, fs_in.TexCoords).rgb;
+    vec3 nightLights = texture(nightLightsTex, fs_in.TexCoords).rgb;
 
     // directional light
     // diffuse
     vec3 normal = normalize(fs_in.Normal);
     vec3 dirLight = normalize(-lightDir);
     float diff = max(dot(dirLight, normal), 0.0);
-    vec3 diffuse = diff * baseColor;
+    vec3 diffuse = diff * baseColor * lightColor;
     // specular
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
     float spec = 0.0;
@@ -61,7 +64,7 @@ void main() {
         vec3 reflectDir = reflect(-lightDir, normal);
         spec = pow(max(dot(viewDir, reflectDir), 0.0), 8.0);
     }
-    vec3 specular = vec3(0.02) * spec;
+    vec3 specular = vec3(0.02) * spec * lightColor;
     // ambient
     vec3 ambient = 0.2 * baseColor;
 

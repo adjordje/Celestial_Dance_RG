@@ -5,6 +5,7 @@
 #include "engine/resources/ResourcesController.hpp"
 #include "engine/graphics/GraphicsController.hpp"
 #include "engine/graphics/OpenGL.hpp"
+#include "../../engine/libs/glfw/include/GLFW/glfw3.h"
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
 public:
@@ -49,6 +50,10 @@ void MainController::initialize() {
     m_moonOrbitEnabled = true;
 
     m_moonLightIntensity = 1.0f;
+
+    // za event
+    m_drawMoon = true;
+    m_lightColor = glm::vec3(1.0f);
 
     engine::graphics::OpenGL::enable_depth_testing();
 }
@@ -108,6 +113,29 @@ void MainController::update() {
         m_moonOrbitEnabled = !m_moonOrbitEnabled;
     }
 
+    // event
+    if (platform->key(engine::platform::KeyId::KEY_T).state() == engine::platform::Key::State::JustPressed) {
+        startTimedEvent(3.0, 6.0);
+    }
+    // reset event
+    if (platform->key(engine::platform::KeyId::KEY_R).state() == engine::platform::Key::State::JustPressed) {
+        resetTimedEvent();
+    }
+
+    if (m_timedEvent.active) {
+        float elapsed = glfwGetTime() - m_timedEvent.startTime;
+
+        if (elapsed > m_timedEvent.delayA && !m_timedEvent.eventATriggered) {
+            m_drawMoon = false;
+            m_timedEvent.eventATriggered = true;
+        }
+
+        if (elapsed > m_timedEvent.delayB && !m_timedEvent.eventBTriggered) {
+            m_lightColor = glm::vec3(1.0f, 0.5f, 0.5f);
+            m_timedEvent.eventBTriggered = true;
+        }
+    }
+
     // Rotacija Zemlje oko svoje ose
     if (m_earthRotationEnabled) {
         m_earthRotationAngle += dt * glm::radians(15.0f);
@@ -152,6 +180,30 @@ void MainController::update() {
     m_moonPosition.z = m_earthPosition.z + m_moonOrbitRadius * sin(m_moonOrbitAngle);
 }
 
+void MainController::startTimedEvent(double a, double b) {
+    m_timedEvent.active = true;
+    m_timedEvent.delayA = a;
+    m_timedEvent.delayB = b;
+    m_timedEvent.startTime = glfwGetTime();
+    m_timedEvent.eventATriggered = false;
+    m_timedEvent.eventBTriggered = false;
+
+    m_drawMoon = true;
+    m_lightColor = glm::vec3(1.0f);
+}
+
+void MainController::resetTimedEvent() {
+    m_timedEvent.active = false;
+    m_timedEvent.delayA = 0.0;
+    m_timedEvent.delayB = 0.0;
+    m_timedEvent.startTime = 0.0;
+    m_timedEvent.eventATriggered = false;
+    m_timedEvent.eventBTriggered = false;
+
+    m_drawMoon = true;
+    m_lightColor = glm::vec3(1.0f);
+}
+
 void MainController::draw_earth() {
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
@@ -180,6 +232,8 @@ void MainController::draw_earth() {
     // za point light
     shader->set_vec3("pointLightPos", m_moonPosition);
     shader->set_vec3("pointLightColor", glm::vec3(0.1f) * m_moonLightIntensity);
+
+    shader->set_vec3("lightColor", m_lightColor);
 
     earth->draw(shader);
 }
@@ -227,6 +281,8 @@ void MainController::draw_moon() {
     shader->set_vec3("viewPos", graphics->camera()->Position);
     shader->set_bool("blinn", true);
 
+    shader->set_vec3("lightColor", m_lightColor);
+
     shader->set_mat4("model", model);
 
     moon->draw(shader);
@@ -247,7 +303,9 @@ void MainController::begin_draw() {
 void MainController::draw() {
     draw_sun();
     draw_earth();
-    draw_moon();
+    if (m_drawMoon) {
+        draw_moon();
+    }
     draw_skybox();
 }
 
@@ -282,4 +340,12 @@ bool MainController::is_moon_rotation_enabled() const {
 
 bool MainController::is_moon_orbit_enabled() const {
     return m_moonOrbitEnabled;
+}
+
+bool MainController::is_moon_visible() const {
+    return m_drawMoon;
+}
+
+bool MainController::is_event_active() const {
+    return m_timedEvent.active;
 }
