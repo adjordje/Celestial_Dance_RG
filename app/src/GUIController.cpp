@@ -21,7 +21,7 @@ void GUIController::draw() {
 
     graphics->begin_gui();
 
-    ImGui::Begin("Camera info");
+    ImGui::Begin("GUI info");
 
     ImGui::Text("Camera position: (%f, %f, %f)", camera->Position.x, camera->Position.y, camera->Position.z);
 
@@ -38,7 +38,9 @@ void GUIController::draw() {
 
     ImGui::Separator();
 
-    ImGui::SliderFloat("Moon light intensity", &mainController->m_moonLightIntensity, 0.0f, 3.0f);
+    ImGui::SliderFloat("Moon light intensity", &mainController->m_moon_light_intensity, 0.0f, 3.0f);
+
+    ImGui::Checkbox("Enable Framebuffer", &mainController->m_use_framebuffer);
 
     ImGui::End();
 

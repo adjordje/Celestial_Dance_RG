@@ -62,6 +62,7 @@ void MainController::initialize() {
     m_light_color = glm::vec3(1.0f);
 
     // framebuffer pocetak
+    m_use_framebuffer = true;
 
     m_post_process_shader = resources->shader("postprocess_shader");
     m_post_process_shader->use();
@@ -386,15 +387,17 @@ void MainController::draw() {
     }
     draw_skybox();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    if(m_use_framebuffer) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-    m_post_process_shader->use();
-    glBindVertexArray(m_quad_vao);
-    glDisable(GL_DEPTH_TEST);
-    glBindTexture(GL_TEXTURE_2D, m_texture_color_buffer);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+        m_post_process_shader->use();
+        glBindVertexArray(m_quad_vao);
+        glDisable(GL_DEPTH_TEST);
+        glBindTexture(GL_TEXTURE_2D, m_texture_color_buffer);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
 }
 
 void MainController::end_draw() {
