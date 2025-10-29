@@ -6,7 +6,7 @@
 #include "engine/graphics/GraphicsController.hpp"
 #include "engine/graphics/OpenGL.hpp"
 #include "../../engine/libs/glad/include/glad/glad.h"
-#include "../../engine/libs/glfw/include/GLFW/glfw3.h"
+#include "GLFW/glfw3.h"
 #include <engine/platform/Window.hpp>
 
 #include <iostream>
@@ -31,41 +31,41 @@ void MainController::initialize() {
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
     engine::graphics::OpenGL::enable_depth_testing();
 
-    m_sunPosition = glm::vec3(0.0f, -5.0f, -25.0f);
-    m_earthStartPosition = glm::vec3(0.0f, -5.0f, -5.0f);
-    m_moonStartPosition = glm::vec3(0.0f, -5.0f, -7.5f);
+    m_sun_position = glm::vec3(0.0f, -5.0f, -25.0f);
+    m_earth_start_position = glm::vec3(0.0f, -5.0f, -5.0f);
+    m_moon_start_position = glm::vec3(0.0f, -5.0f, -7.5f);
 
-    m_earthRotationAngle = 0.0f;
-    m_sunRotationAngle = 0.0f;
-    m_moonRotationAngle = 0.0f;
+    m_earth_rotation_angle = 0.0f;
+    m_sun_rotation_angle = 0.0f;
+    m_moon_rotation_angle = 0.0f;
 
-    glm::vec3 dirES = m_earthStartPosition - m_sunPosition;
-    m_earthOrbitRadius = glm::length(dirES);
+    glm::vec3 dirES = m_earth_start_position - m_sun_position;
+    m_earth_orbit_radius = glm::length(dirES);
 
-    m_earthOrbitAngle = atan2(dirES.z, dirES.x); //daje ugao u xy-ravni
+    m_earth_orbit_angle = atan2(dirES.z, dirES.x); //daje ugao u xy-ravni
 
-    glm::vec3 dirME = m_moonStartPosition - m_earthStartPosition;
-    m_moonOrbitRadius = glm::length(dirME);
+    glm::vec3 dirME = m_moon_start_position - m_earth_start_position;
+    m_moon_orbit_radius = glm::length(dirME);
 
-    m_moonOrbitAngle = atan2(dirME.z, dirME.x);
+    m_moon_orbit_angle = atan2(dirME.z, dirME.x);
 
-    m_earthOrbitEnabled = true;
-    m_earthRotationEnabled = true;
-    m_sunRotationEnabled = true;
-    m_moonRotationEnabled = true;
-    m_moonOrbitEnabled = true;
+    m_earth_orbit_enabled = true;
+    m_earth_rotation_enabled = true;
+    m_sun_rotation_enabled = true;
+    m_moon_rotation_enabled = true;
+    m_moon_orbit_enabled = true;
 
-    m_moonLightIntensity = 1.0f;
+    m_moon_light_intensity = 1.0f;
 
     // za event
-    m_drawMoon = true;
-    m_lightColor = glm::vec3(1.0f);
+    m_draw_moon = true;
+    m_light_color = glm::vec3(1.0f);
 
     // framebuffer pocetak
 
-    m_postProcessShader = resources->shader("postprocess_shader");
-    m_postProcessShader->use();
-    m_postProcessShader->set_int("screen_texture", 0);
+    m_post_process_shader = resources->shader("postprocess_shader");
+    m_post_process_shader->use();
+    m_post_process_shader->set_int("screen_texture", 0);
 
     float quadVertices[] = {
         -1.0f, 1.0f, 0.0f, 1.0f,
@@ -83,14 +83,14 @@ void MainController::initialize() {
     glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-    glGenTextures(1, &m_textureColorBuffer);
-    glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
+    glGenTextures(1, &m_texture_color_buffer);
+    glBindTexture(GL_TEXTURE_2D, m_texture_color_buffer);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth,
                         screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureColorBuffer, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture_color_buffer, 0);
 
     glGenRenderbuffers(1, &m_rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
@@ -103,10 +103,10 @@ void MainController::initialize() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // quad
-    glGenVertexArrays(1, &m_quadVAO);
-    glGenBuffers(1, &m_quadVBO);
-    glBindVertexArray(m_quadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
+    glGenVertexArrays(1, &m_quad_vao);
+    glGenBuffers(1, &m_quad_vbo);
+    glBindVertexArray(m_quad_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
@@ -150,114 +150,114 @@ void MainController::update() {
 
     // Zemlja rotacija
     if (platform->key(engine::platform::KeyId::KEY_1).state() == engine::platform::Key::State::JustPressed) {
-        m_earthRotationEnabled = !m_earthRotationEnabled;
+        m_earth_rotation_enabled = !m_earth_rotation_enabled;
     }
     // Zemlja rotacija oko Sunca
     if (platform->key(engine::platform::KeyId::KEY_2).state() == engine::platform::Key::State::JustPressed) {
-        m_earthOrbitEnabled = !m_earthOrbitEnabled;
+        m_earth_orbit_enabled = !m_earth_orbit_enabled;
     }
     // Sunce rotacija
     if (platform->key(engine::platform::KeyId::KEY_3).state() == engine::platform::Key::State::JustPressed) {
-        m_sunRotationEnabled = !m_sunRotationEnabled;
+        m_sun_rotation_enabled = !m_sun_rotation_enabled;
     }
     // Mesec rotacija
     if (platform->key(engine::platform::KeyId::KEY_4).state() == engine::platform::Key::State::JustPressed) {
-        m_moonRotationEnabled = !m_moonRotationEnabled;
+        m_moon_rotation_enabled = !m_moon_rotation_enabled;
     }
     // Mesec rotacija oko Zemlje
     if (platform->key(engine::platform::KeyId::KEY_5).state() == engine::platform::Key::State::JustPressed) {
-        m_moonOrbitEnabled = !m_moonOrbitEnabled;
+        m_moon_orbit_enabled = !m_moon_orbit_enabled;
     }
 
     // event
     if (platform->key(engine::platform::KeyId::KEY_T).state() == engine::platform::Key::State::JustPressed) {
-        startTimedEvent(3.0, 6.0);
+        start_timed_event(3.0, 6.0);
     }
     // reset event
     if (platform->key(engine::platform::KeyId::KEY_R).state() == engine::platform::Key::State::JustPressed) {
-        resetTimedEvent();
+        reset_timed_event();
     }
 
-    if (m_timedEvent.active) {
-        float elapsed = glfwGetTime() - m_timedEvent.startTime;
+    if (m_timed_event.active) {
+        float elapsed = glfwGetTime() - m_timed_event.startTime;
 
-        if (elapsed > m_timedEvent.delayA && !m_timedEvent.eventATriggered) {
-            m_drawMoon = false;
-            m_timedEvent.eventATriggered = true;
+        if (elapsed > m_timed_event.delayA && !m_timed_event.eventATriggered) {
+            m_draw_moon = false;
+            m_timed_event.eventATriggered = true;
         }
 
-        if (elapsed > m_timedEvent.delayB && !m_timedEvent.eventBTriggered) {
-            m_lightColor = glm::vec3(1.0f, 0.5f, 0.5f);
-            m_timedEvent.eventBTriggered = true;
+        if (elapsed > m_timed_event.delayB && !m_timed_event.eventBTriggered) {
+            m_light_color = glm::vec3(1.0f, 0.5f, 0.5f);
+            m_timed_event.eventBTriggered = true;
         }
     }
 
     // Rotacija Zemlje oko svoje ose
-    if (m_earthRotationEnabled) {
-        m_earthRotationAngle += dt * glm::radians(15.0f);
-        if (m_earthRotationAngle > glm::two_pi<float>())
-            m_earthRotationAngle -= glm::two_pi<float>();
+    if (m_earth_rotation_enabled) {
+        m_earth_rotation_angle += dt * glm::radians(15.0f);
+        if (m_earth_rotation_angle > glm::two_pi<float>())
+            m_earth_rotation_angle -= glm::two_pi<float>();
     }
 
     // Rotacija Zemlje oko Sunca
-    if (m_earthOrbitEnabled) {
-        m_earthOrbitAngle += dt * glm::radians(5.0f);
-        if (m_earthOrbitAngle > glm::two_pi<float>())
-            m_earthOrbitAngle -= glm::two_pi<float>();
+    if (m_earth_orbit_enabled) {
+        m_earth_orbit_angle += dt * glm::radians(5.0f);
+        if (m_earth_orbit_angle > glm::two_pi<float>())
+            m_earth_orbit_angle -= glm::two_pi<float>();
     }
 
-    m_earthPosition.x = m_sunPosition.x + m_earthOrbitRadius * cos(m_earthOrbitAngle);
-    m_earthPosition.y = m_sunPosition.y;
-    m_earthPosition.z = m_sunPosition.z + m_earthOrbitRadius * sin(m_earthOrbitAngle);
+    m_earth_position.x = m_sun_position.x + m_earth_orbit_radius * cos(m_earth_orbit_angle);
+    m_earth_position.y = m_sun_position.y;
+    m_earth_position.z = m_sun_position.z + m_earth_orbit_radius * sin(m_earth_orbit_angle);
 
     // Rotacija Sunca oko svoje ose
-    if (m_sunRotationEnabled) {
-        m_sunRotationAngle += dt * glm::radians(0.5f);
-        if (m_sunRotationAngle > glm::two_pi<float>())
-            m_sunRotationAngle -= glm::two_pi<float>();
+    if (m_sun_rotation_enabled) {
+        m_sun_rotation_angle += dt * glm::radians(0.5f);
+        if (m_sun_rotation_angle > glm::two_pi<float>())
+            m_sun_rotation_angle -= glm::two_pi<float>();
     }
 
     // Rotacija Meseca oko svoje ose
-    if (m_moonRotationEnabled) {
-        m_moonRotationAngle += dt * glm::radians(80.0f);
-        if (m_moonRotationAngle > glm::two_pi<float>())
-            m_moonRotationAngle -= glm::two_pi<float>();
+    if (m_moon_rotation_enabled) {
+        m_moon_rotation_angle += dt * glm::radians(80.0f);
+        if (m_moon_rotation_angle > glm::two_pi<float>())
+            m_moon_rotation_angle -= glm::two_pi<float>();
     }
 
     // Rotacija Meseca oko Zemlje
-    if (m_moonOrbitEnabled) {
-        m_moonOrbitAngle += dt * glm::radians(50.0f);
-        if (m_moonOrbitAngle > glm::two_pi<float>())
-            m_moonOrbitAngle -= glm::two_pi<float>();
+    if (m_moon_orbit_enabled) {
+        m_moon_orbit_angle += dt * glm::radians(50.0f);
+        if (m_moon_orbit_angle > glm::two_pi<float>())
+            m_moon_orbit_angle -= glm::two_pi<float>();
     }
 
-    m_moonPosition.x = m_earthPosition.x + m_moonOrbitRadius * cos(m_moonOrbitAngle);
-    m_moonPosition.y = m_earthPosition.y;
-    m_moonPosition.z = m_earthPosition.z + m_moonOrbitRadius * sin(m_moonOrbitAngle);
+    m_moon_position.x = m_earth_position.x + m_moon_orbit_radius * cos(m_moon_orbit_angle);
+    m_moon_position.y = m_earth_position.y;
+    m_moon_position.z = m_earth_position.z + m_moon_orbit_radius * sin(m_moon_orbit_angle);
 }
 
-void MainController::startTimedEvent(double a, double b) {
-    m_timedEvent.active = true;
-    m_timedEvent.delayA = a;
-    m_timedEvent.delayB = b;
-    m_timedEvent.startTime = glfwGetTime();
-    m_timedEvent.eventATriggered = false;
-    m_timedEvent.eventBTriggered = false;
+void MainController::start_timed_event(double a, double b) {
+    m_timed_event.active = true;
+    m_timed_event.delayA = a;
+    m_timed_event.delayB = b;
+    m_timed_event.startTime = glfwGetTime();
+    m_timed_event.eventATriggered = false;
+    m_timed_event.eventBTriggered = false;
 
-    m_drawMoon = true;
-    m_lightColor = glm::vec3(1.0f);
+    m_draw_moon = true;
+    m_light_color = glm::vec3(1.0f);
 }
 
-void MainController::resetTimedEvent() {
-    m_timedEvent.active = false;
-    m_timedEvent.delayA = 0.0;
-    m_timedEvent.delayB = 0.0;
-    m_timedEvent.startTime = 0.0;
-    m_timedEvent.eventATriggered = false;
-    m_timedEvent.eventBTriggered = false;
+void MainController::reset_timed_event() {
+    m_timed_event.active = false;
+    m_timed_event.delayA = 0.0;
+    m_timed_event.delayB = 0.0;
+    m_timed_event.startTime = 0.0;
+    m_timed_event.eventATriggered = false;
+    m_timed_event.eventBTriggered = false;
 
-    m_drawMoon = true;
-    m_lightColor = glm::vec3(1.0f);
+    m_draw_moon = true;
+    m_light_color = glm::vec3(1.0f);
 }
 
 void MainController::draw_earth() {
@@ -272,13 +272,13 @@ void MainController::draw_earth() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, m_earthPosition);
+    model = glm::translate(model, m_earth_position);
     model = glm::rotate(model, 3.14f, glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::rotate(model, m_earthRotationAngle, glm::vec3(0.0f, 0.765f, 0.235f)); //rotacija oko svoje ose
+    model = glm::rotate(model, m_earth_rotation_angle, glm::vec3(0.0f, 0.765f, 0.235f)); //rotacija oko svoje ose
 
     shader->set_mat4("model", model);
 
-    glm::vec3 lightDir = glm::normalize(m_earthPosition - m_sunPosition);
+    glm::vec3 lightDir = glm::normalize(m_earth_position - m_sun_position);
 
     // za directional light
     shader->set_vec3("lightDir", lightDir);
@@ -286,10 +286,10 @@ void MainController::draw_earth() {
     shader->set_bool("blinn", true);
 
     // za point light
-    shader->set_vec3("pointLightPos", m_moonPosition);
-    shader->set_vec3("pointLightColor", glm::vec3(0.1f) * m_moonLightIntensity);
+    shader->set_vec3("pointLightPos", m_moon_position);
+    shader->set_vec3("pointLightColor", glm::vec3(0.1f) * m_moon_light_intensity);
 
-    shader->set_vec3("lightColor", m_lightColor);
+    shader->set_vec3("lightColor", m_light_color);
 
     earth->draw(shader);
 }
@@ -307,7 +307,7 @@ void MainController::draw_sun() {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, -5.0f, -25.0f));
     model = glm::scale(model, glm::vec3(0.01f));
-    model = glm::rotate(model, m_sunRotationAngle, glm::vec3(0.0f, 1.0f, 0.0f)); //rotacija oko svoje ose
+    model = glm::rotate(model, m_sun_rotation_angle, glm::vec3(0.0f, 1.0f, 0.0f)); //rotacija oko svoje ose
 
     shader->set_mat4("model", model);
 
@@ -327,17 +327,17 @@ void MainController::draw_moon() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model = glm::mat4(1.0f);
 
-    model = glm::translate(model, m_moonPosition);
-    model = glm::rotate(model, m_moonRotationAngle, glm::vec3(0.0f, 0.93f, 0.07f));
+    model = glm::translate(model, m_moon_position);
+    model = glm::rotate(model, m_moon_rotation_angle, glm::vec3(0.0f, 0.93f, 0.07f));
     model = glm::scale(model, glm::vec3(0.15f));
 
-    glm::vec3 lightDir = glm::normalize(m_moonPosition - m_sunPosition);
+    glm::vec3 lightDir = glm::normalize(m_moon_position - m_sun_position);
 
     shader->set_vec3("lightDir", lightDir);
     shader->set_vec3("viewPos", graphics->camera()->Position);
     shader->set_bool("blinn", true);
 
-    shader->set_vec3("lightColor", m_lightColor);
+    shader->set_vec3("lightColor", m_light_color);
 
     shader->set_mat4("model", model);
 
@@ -354,7 +354,7 @@ void MainController::draw_skybox() {
 
 void MainController::begin_draw() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
-    if(m_useFramebuffer) {
+    if(m_use_framebuffer) {
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
         resize_framebuffer(platform->window()->width(), platform->window()->height());
     } else {
@@ -365,7 +365,7 @@ void MainController::begin_draw() {
 }
 
 void MainController::resize_framebuffer(int width, int height) {
-    glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
+    glBindTexture(GL_TEXTURE_2D, m_texture_color_buffer);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width,
                         height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
@@ -381,7 +381,7 @@ void MainController::draw() {
 
     draw_sun();
     draw_earth();
-    if (m_drawMoon) {
+    if (m_draw_moon) {
         draw_moon();
     }
     draw_skybox();
@@ -390,10 +390,10 @@ void MainController::draw() {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    m_postProcessShader->use();
-    glBindVertexArray(m_quadVAO);
+    m_post_process_shader->use();
+    glBindVertexArray(m_quad_vao);
     glDisable(GL_DEPTH_TEST);
-    glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
+    glBindTexture(GL_TEXTURE_2D, m_texture_color_buffer);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
@@ -403,37 +403,37 @@ void MainController::end_draw() {
 }
 
 glm::vec3 MainController::get_earths_position() const {
-    return m_earthPosition;
+    return m_earth_position;
 }
 
 glm::vec3 MainController::get_moons_position() const {
-    return m_moonPosition;
+    return m_moon_position;
 }
 
 bool MainController::is_earth_rotation_enabled() const {
-    return m_earthRotationEnabled;
+    return m_earth_rotation_enabled;
 }
 
 bool MainController::is_earth_orbit_enabled() const {
-    return m_earthOrbitEnabled;
+    return m_earth_orbit_enabled;
 }
 
 bool MainController::is_sun_rotation_enabled() const {
-    return m_sunRotationEnabled;
+    return m_sun_rotation_enabled;
 }
 
 bool MainController::is_moon_rotation_enabled() const {
-    return m_moonRotationEnabled;
+    return m_moon_rotation_enabled;
 }
 
 bool MainController::is_moon_orbit_enabled() const {
-    return m_moonOrbitEnabled;
+    return m_moon_orbit_enabled;
 }
 
 bool MainController::is_moon_visible() const {
-    return m_drawMoon;
+    return m_draw_moon;
 }
 
 bool MainController::is_event_active() const {
-    return m_timedEvent.active;
+    return m_timed_event.active;
 }

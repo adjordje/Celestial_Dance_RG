@@ -20,7 +20,8 @@ public:
         return "MainController";
     }
 
-    float m_moonLightIntensity; // za gui
+    float m_moon_light_intensity; // za gui
+    bool m_use_framebuffer; // za gui
 
     glm::vec3 get_earths_position() const;
     glm::vec3 get_moons_position() const;
@@ -47,44 +48,44 @@ private:
     void update_camera();
     void update() override;
 
-    void startTimedEvent(double a, double b);
-    void resetTimedEvent();
+    void start_timed_event(double a, double b);
+    void reset_timed_event();
 
     void resize_framebuffer(int width, int height);
 
-    glm::vec3 m_sunPosition;
-    glm::vec3 m_earthStartPosition;
-    glm::vec3 m_earthPosition;
-    glm::vec3 m_moonStartPosition;
-    glm::vec3 m_moonPosition;
+    glm::vec3 m_sun_position;
+    glm::vec3 m_earth_start_position;
+    glm::vec3 m_earth_position;
+    glm::vec3 m_moon_start_position;
+    glm::vec3 m_moon_position;
 
-    float m_earthRotationAngle;
-    float m_sunRotationAngle;
-    float m_earthOrbitRadius;
-    float m_earthOrbitAngle;
-    float m_moonRotationAngle;
-    float m_moonOrbitAngle;
-    float m_moonOrbitRadius;
+    float m_earth_rotation_angle;
+    float m_sun_rotation_angle;
+    float m_earth_orbit_radius;
+    float m_earth_orbit_angle;
+    float m_moon_rotation_angle;
+    float m_moon_orbit_angle;
+    float m_moon_orbit_radius;
 
-    bool m_earthRotationEnabled; // Zemlja rotira oko svoje ose
-    bool m_earthOrbitEnabled; // Zemlja orbitira oko Sunca
-    bool m_sunRotationEnabled; // Sunce rotira oko svoje ose
-    bool m_moonRotationEnabled; // Mesec rotira oko svoje ose
-    bool m_moonOrbitEnabled; // Mesec orbitira oko Zemlje
+    bool m_earth_rotation_enabled; // Zemlja rotira oko svoje ose
+    bool m_earth_orbit_enabled; // Zemlja orbitira oko Sunca
+    bool m_sun_rotation_enabled; // Sunce rotira oko svoje ose
+    bool m_moon_rotation_enabled; // Mesec rotira oko svoje ose
+    bool m_moon_orbit_enabled; // Mesec orbitira oko Zemlje
 
     // za event
-    bool m_drawMoon;
-    glm::vec3 m_lightColor;
-    TimedEvent m_timedEvent;
+    bool m_draw_moon;
+    glm::vec3 m_light_color;
+    TimedEvent m_timed_event;
 
     unsigned int m_fbo;
-    unsigned int m_textureColorBuffer;
+    unsigned int m_texture_color_buffer;
     unsigned int m_rbo;
 
-    unsigned int m_quadVAO = 0;
-    unsigned int m_quadVBO = 0;
+    unsigned int m_quad_vao = 0;
+    unsigned int m_quad_vbo = 0;
 
-    engine::resources::Shader* m_postProcessShader = nullptr;
+    engine::resources::Shader* m_post_process_shader = nullptr;
 };
 
 
