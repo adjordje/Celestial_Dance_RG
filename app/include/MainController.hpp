@@ -2,6 +2,7 @@
 #define MAINCONTROLLER_HPP
 #include "engine/core/Controller.hpp"
 
+#include <engine/resources/Shader.hpp>
 #include <glm/vec3.hpp>
 
 struct TimedEvent {
@@ -49,6 +50,8 @@ private:
     void startTimedEvent(double a, double b);
     void resetTimedEvent();
 
+    void resize_framebuffer(int width, int height);
+
     glm::vec3 m_sunPosition;
     glm::vec3 m_earthStartPosition;
     glm::vec3 m_earthPosition;
@@ -74,6 +77,14 @@ private:
     glm::vec3 m_lightColor;
     TimedEvent m_timedEvent;
 
+    unsigned int m_fbo;
+    unsigned int m_textureColorBuffer;
+    unsigned int m_rbo;
+
+    unsigned int m_quadVAO = 0;
+    unsigned int m_quadVBO = 0;
+
+    engine::resources::Shader* m_postProcessShader = nullptr;
 };
 
 

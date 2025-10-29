@@ -5,7 +5,11 @@
 #include "engine/resources/ResourcesController.hpp"
 #include "engine/graphics/GraphicsController.hpp"
 #include "engine/graphics/OpenGL.hpp"
+#include "../../engine/libs/glad/include/glad/glad.h"
 #include "../../engine/libs/glfw/include/GLFW/glfw3.h"
+#include <engine/platform/Window.hpp>
+
+#include <iostream>
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
 public:
@@ -23,7 +27,9 @@ void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition po
 
 void MainController::initialize() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
+    engine::graphics::OpenGL::enable_depth_testing();
 
     m_sunPosition = glm::vec3(0.0f, -5.0f, -25.0f);
     m_earthStartPosition = glm::vec3(0.0f, -5.0f, -5.0f);
@@ -55,7 +61,57 @@ void MainController::initialize() {
     m_drawMoon = true;
     m_lightColor = glm::vec3(1.0f);
 
-    engine::graphics::OpenGL::enable_depth_testing();
+    // framebuffer pocetak
+
+    m_postProcessShader = resources->shader("postprocess_shader");
+    m_postProcessShader->use();
+    m_postProcessShader->set_int("screen_texture", 0);
+
+    float quadVertices[] = {
+        -1.0f, 1.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f,
+        1.0f, -1.0f, 1.0f, 0.0f,
+
+        -1.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, -1.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 1.0f, 1.0f
+    };
+
+    int screenWidth = platform->window()->width();
+    int screenHeight = platform->window()->height();
+
+    glGenFramebuffers(1, &m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+    glGenTextures(1, &m_textureColorBuffer);
+    glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth,
+                        screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureColorBuffer, 0);
+
+    glGenRenderbuffers(1, &m_rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+        std::cout << "Framebuffer is complete!" << std::endl;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // quad
+    glGenVertexArrays(1, &m_quadVAO);
+    glGenBuffers(1, &m_quadVBO);
+    glBindVertexArray(m_quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
 bool MainController::loop() {
@@ -297,16 +353,48 @@ void MainController::draw_skybox() {
 }
 
 void MainController::begin_draw() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    if(m_useFramebuffer) {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+        resize_framebuffer(platform->window()->width(), platform->window()->height());
+    } else {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
     engine::graphics::OpenGL::clear_buffers();
 }
 
+void MainController::resize_framebuffer(int width, int height) {
+    glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width,
+                        height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
+    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+}
+
 void MainController::draw() {
+    // render u framebuffer
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
     draw_sun();
     draw_earth();
     if (m_drawMoon) {
         draw_moon();
     }
     draw_skybox();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    m_postProcessShader->use();
+    glBindVertexArray(m_quadVAO);
+    glDisable(GL_DEPTH_TEST);
+    glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void MainController::end_draw() {
