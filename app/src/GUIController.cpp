@@ -5,7 +5,11 @@
 
 #include "MainController.hpp"
 
-void GUIController::initialize() { set_enable(false); }
+void GUIController::initialize() {
+    set_enable(false);
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    m_post_process = graphics->get_postprocess();
+}
 
 void GUIController::poll_events() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
@@ -41,6 +45,7 @@ void GUIController::draw() {
     ImGui::SliderFloat("Moon light intensity", &mainController->m_moon_light_intensity, 0.0f, 3.0f);
 
     ImGui::Checkbox("Enable Framebuffer", &mainController->m_use_framebuffer);
+    m_post_process->set_enabled(mainController->m_use_framebuffer);
 
     ImGui::End();
 
