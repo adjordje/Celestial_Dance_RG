@@ -44,6 +44,10 @@ void GraphicsController::initialize() {
     RG_GUARANTEE(ImGui_ImplOpenGL3_Init("#version 330 core"), "ImGUI failed to initialize for OpenGL");
 }
 
+void GraphicsController::create_postprocess(int width, int height, const resources::Shader *shader) { m_postprocess = std::make_unique<PostProcess>(width, height, shader); }
+
+PostProcess *GraphicsController::get_postprocess() { return m_postprocess.get(); }
+
 void GraphicsController::terminate() {
     if (ImGui::GetCurrentContext()) {
         ImGui_ImplOpenGL3_Shutdown();
@@ -64,9 +68,7 @@ void GraphicsPlatformEventObserver::on_window_resize(int width, int height) {
               .Top = static_cast<float>(height);
 }
 
-std::string_view GraphicsController::name() const {
-    return "GraphicsController";
-}
+std::string_view GraphicsController::name() const { return "GraphicsController"; }
 
 void GraphicsController::begin_gui() {
     ImGui_ImplOpenGL3_NewFrame();
@@ -90,7 +92,7 @@ void GraphicsController::draw_skybox(const resources::Shader *shader, const reso
     CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_CUBE_MAP, skybox->texture());
     CHECKED_GL_CALL(glDrawArrays, GL_TRIANGLES, 0, 36);
     CHECKED_GL_CALL(glBindVertexArray, 0);
-    CHECKED_GL_CALL(glDepthFunc, GL_LESS); // set depth function back to default
+    CHECKED_GL_CALL(glDepthFunc, GL_LESS);// set depth function back to default
     CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_CUBE_MAP, 0);
 }
 }
