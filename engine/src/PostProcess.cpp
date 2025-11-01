@@ -54,10 +54,10 @@ PostProcess::PostProcess(int width, int height, const resources::Shader *shader)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *) (2 * sizeof(float)));
 }
 
-void PostProcess::begin_draw() {
+void PostProcess::begin_draw(int width, int height) {
     if (m_enabled) {
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-        resize(m_width, m_height);
+        if (width != m_width || height != m_height) { resize(width, height); }
     } else { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);

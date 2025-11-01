@@ -172,7 +172,7 @@ namespace engine::graphics {
         glm::mat4 m_projection_matrix{};
         Camera m_camera{};
         ImGuiContext *m_imgui_context{};
-        std::unique_ptr<PostProcess> m_postprocess;
+        std::unique_ptr<PostProcess> m_post_process;
     };
 
     /**

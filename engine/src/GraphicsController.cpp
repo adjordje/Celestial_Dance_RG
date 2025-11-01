@@ -44,9 +44,9 @@ void GraphicsController::initialize() {
     RG_GUARANTEE(ImGui_ImplOpenGL3_Init("#version 330 core"), "ImGUI failed to initialize for OpenGL");
 }
 
-void GraphicsController::create_postprocess(int width, int height, const resources::Shader *shader) { m_postprocess = std::unique_ptr<PostProcess>(new PostProcess(width, height, shader)); }
+void GraphicsController::create_postprocess(int width, int height, const resources::Shader *shader) { m_post_process = std::unique_ptr<PostProcess>(new PostProcess(width, height, shader)); }
 
-PostProcess *GraphicsController::get_postprocess() { return m_postprocess.get(); }
+PostProcess *GraphicsController::get_postprocess() { return m_post_process.get(); }
 
 void GraphicsController::terminate() {
     if (ImGui::GetCurrentContext()) {

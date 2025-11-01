@@ -12,7 +12,7 @@ class PostProcess {
 public:
     void draw();
 
-    void begin_draw();
+    void begin_draw(int width, int height);
 
     void resize(int width, int height);
 

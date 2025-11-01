@@ -2,6 +2,7 @@
 #define MAINCONTROLLER_HPP
 #include "engine/core/Controller.hpp"
 
+#include <engine/graphics/PostProcess.hpp>
 #include <engine/resources/Shader.hpp>
 #include <glm/vec3.hpp>
 
@@ -16,39 +17,54 @@ struct TimedEvent {
 
 class MainController : public engine::core::Controller {
 public:
-    std::string_view name() const override {
-        return "MainController";
-    }
+    std::string_view name() const override { return "MainController"; }
 
-    float m_moon_light_intensity; // za gui
-    bool m_use_framebuffer; // za gui
+    float m_moon_light_intensity;// za gui
+    bool m_use_framebuffer;      // za gui
 
     glm::vec3 get_earths_position() const;
+
     glm::vec3 get_moons_position() const;
+
     bool is_earth_rotation_enabled() const;
+
     bool is_earth_orbit_enabled() const;
+
     bool is_sun_rotation_enabled() const;
+
     bool is_moon_rotation_enabled() const;
+
     bool is_moon_orbit_enabled() const;
+
     bool is_moon_visible() const;
+
     bool is_event_active() const;
 
 private:
     void initialize() override;
+
     bool loop() override;
 
     void draw() override;
+
     void begin_draw() override;
+
     void end_draw() override;
+
     void draw_earth();
+
     void draw_sun();
+
     void draw_moon();
+
     void draw_skybox();
 
     void update_camera();
+
     void update() override;
 
     void start_timed_event(double a, double b);
+
     void reset_timed_event();
 
     void resize_framebuffer(int width, int height);
@@ -67,27 +83,18 @@ private:
     float m_moon_orbit_angle;
     float m_moon_orbit_radius;
 
-    bool m_earth_rotation_enabled; // Zemlja rotira oko svoje ose
-    bool m_earth_orbit_enabled; // Zemlja orbitira oko Sunca
-    bool m_sun_rotation_enabled; // Sunce rotira oko svoje ose
+    bool m_earth_rotation_enabled;// Zemlja rotira oko svoje ose
+    bool m_earth_orbit_enabled;   // Zemlja orbitira oko Sunca
+    bool m_sun_rotation_enabled;  // Sunce rotira oko svoje ose
     bool m_moon_rotation_enabled; // Mesec rotira oko svoje ose
-    bool m_moon_orbit_enabled; // Mesec orbitira oko Zemlje
+    bool m_moon_orbit_enabled;    // Mesec orbitira oko Zemlje
 
     // za event
     bool m_draw_moon;
     glm::vec3 m_light_color;
     TimedEvent m_timed_event;
 
-    unsigned int m_fbo;
-    unsigned int m_texture_color_buffer;
-    unsigned int m_rbo;
-
-    unsigned int m_quad_vao = 0;
-    unsigned int m_quad_vbo = 0;
-
-    engine::resources::Shader* m_post_process_shader = nullptr;
+    engine::graphics::PostProcess *m_post_process;
 };
-
-
 
 #endif //MAINCONTROLLER_HPP
