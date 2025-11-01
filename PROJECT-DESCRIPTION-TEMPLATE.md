@@ -1,9 +1,10 @@
 # Celestial Dance
 
 Broj indeksa: 255/2019  
-Ime i prezime: Djordje Aksentijevic  
+Ime i prezime: Djordje Aksentijevic
 
-Celestial dance is an interactive simulation of a simplified solar system, showcasing Earths rotation around its own axis and orbiting the Sun alongside the Moon.
+Celestial dance is an interactive simulation of a simplified solar system, showcasing Earths rotation around its own
+axis and orbiting the Sun alongside the Moon.
 
 ## Controls
 
@@ -14,7 +15,7 @@ Celestial dance is an interactive simulation of a simplified solar system, showc
 {KEY_3} -> {Toggle Sun rotation (around own axis)}  
 {KEY_4} -> {Toggle Moon rotation (around own axis)}  
 {KEY_5} -> {Toggle Moon orbit (around Earth)}  
-{R} -> {Reset to the state before the event with triggers}  
+{R} -> {Reset to the state before the event with triggers}
 
 ## Features
 
@@ -22,7 +23,8 @@ Celestial dance is an interactive simulation of a simplified solar system, showc
 
 [x] Model with lighting  
 [x] Two types of lighting with customizable colors and movement through GUI or ACTIONS  
-[x] {Press T} --- AFTER_3_SECONDS---Triggers---> {Moon disappearing} ---> AFTER_6_SECONDS---Triggers---> {Light color of the Sun changes}
+[x] {Press T} --- AFTER_3_SECONDS---Triggers---> {Moon disappearing} ---> AFTER_6_SECONDS---Triggers---> {Light color of
+the Sun changes}
 
 ### Group A:
 
@@ -32,6 +34,7 @@ Celestial dance is an interactive simulation of a simplified solar system, showc
 [ ] Parallax Mapping
 
 ### Group B:
+
 [ ] Bloom with the use of HDR  
 [ ] Deferred Shading  
 [ ] Point Shadows  
@@ -39,7 +42,7 @@ Celestial dance is an interactive simulation of a simplified solar system, showc
 
 ### Engine improvement:
 
-[ ] ...
+Added PostProcess class which creates framebuffer and can only be made from GraphicsController.
 
 ## Models:
 
